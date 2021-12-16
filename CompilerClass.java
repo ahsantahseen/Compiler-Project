@@ -2,15 +2,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class main {
-    public static void lexicalAnalysis() {
-        System.out.println("Lexical");
+public class CompilerClass {
+    public void lexicalAnalysis() {
+        System.out.println("Lexical Analysis");
         try {
-            File fileObject = new File("./lexicalInput.txt");
+            File fileObject = new File("input.txt");
             Scanner fileReader = new Scanner(fileObject);
             while (fileReader.hasNextLine()) {
                 String data = fileReader.nextLine();
-                System.out.println(data);
+                String tokens[] = data.split(" ");
+                for (int i = 0; i < tokens.length; i++) {
+                    System.out.println(tokens[i]);
+                }
             }
             fileReader.close();
         } catch (FileNotFoundException e) {
@@ -19,22 +22,24 @@ public class main {
         }
     }
 
-    public static void lexicalAndSyntaxAnalysis() {
+    public void lexicalAndSyntaxAnalysis() {
         System.out.println("Lexical + Syntax");
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        CompilerClass obj = new CompilerClass();
         System.out.println("Select Following Feature of compiler");
         System.out.println("1. Lexical Analysis ");
         System.out.println("2. Lexical Analysis and Syntax Analysis ");
         System.out.print("Please Select Your Choice:");
         int choice = sc.nextInt();
         sc.close();
+
         if (choice == 1) {
-            lexicalAnalysis();
+            obj.lexicalAnalysis();
         } else if (choice == 2) {
-            lexicalAndSyntaxAnalysis();
+            obj.lexicalAndSyntaxAnalysis();
         } else {
             System.out.println("Error Wrong Choice");
         }
