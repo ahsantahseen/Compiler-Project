@@ -104,6 +104,7 @@ public class CompilerClass {
                     }
                 }
             }
+            br.close();
         } catch (
         // Exception handling
         FileNotFoundException e) {
