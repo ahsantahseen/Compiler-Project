@@ -1,3 +1,4 @@
+
 /*
 Compiler Construction Project 
 
@@ -99,6 +100,32 @@ public class CompilerClass {
                         i--;
                         // Returning the number
                         System.out.println("Number : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    }
+                    // Condition to check for Strings
+                    else if (line.charAt(i) == '"') {
+                        /*
+                         * Here we are contactinating the lexeme with the next char,
+                         * and then we are running a while loop until length of the line (string)
+                         * and concatinating the lexeme, we are using an Regex (regular expression) that
+                         * checks if our lexeme is a string or not by simply that if anything is between
+                         * quotes "" then instantly break loop because our string has been formed
+                         * 
+                         */
+                        lexeme += line.charAt(i++);
+                        while (i < line.length()) {
+                            lexeme += line.charAt(i++);
+                            if (lexeme.matches("\".*\"")) {
+                                break;
+                            }
+                        }
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the string with trimming out the "" by creating a substring that
+                        // starts from 2nd index to 2nd last index
+                        lexeme = lexeme.substring(1, lexeme.length() - 1);
+                        System.out.println("String : " + lexeme);
                         // Clearing the lexeme once it's returned
                         lexeme = "";
                     }
