@@ -4,7 +4,7 @@ Compiler Construction Project
 
 Author: Muhammad Ahsan 1912310 Section 5F BSCS
 Language: Java 
-Compiled on: JavaSE-13
+Compiled with: JavaSE-13
 Development Resources Used: Microsoft Visual Studio Code with Redhat Java Extension 
 
 */
@@ -187,19 +187,24 @@ public class CompilerClass {
                         // Clearing the lexeme once it's returned
                         lexeme = "";
 
-                    } else if (line.charAt(i) == '/') {
+                    }
+                    // Here we are defining condition for divide and single line comments
+                    else if (line.charAt(i) == '/') {
+                        // Storing into lexeme
                         lexeme += line.charAt(i++);
-
-                        // Taking the pointer to one step back
+                        // Looping through the line
                         while (i < line.length()) {
-
+                            // Concatinating lexeme
                             lexeme += line.charAt(i);
+                            // Increment the pointer
                             i++;
+                            // Regex for matching
                             if (lexeme.matches("/ ")) {
                                 // Returning the op
                                 break;
                             }
                         }
+                        // Seprator Logic between divide and comments
                         if (lexeme.startsWith("//")) {
                             System.out.println("comment: " + lexeme);
                         } else {
@@ -258,8 +263,13 @@ public class CompilerClass {
                         System.out.println("oo : " + lexeme);
                         // Clearing the lexeme once it's returned
                         lexeme = "";
+                    } else {
+                        // Error Handling for unrecognized lexemes
+                        lexeme += line.charAt(i);
+                        System.out.println("Error: Unrecognized Lexeme: " + lexeme);
+                        System.out.println("Line: " + lineNumber);
+                        lexeme = "";
                     }
-
                 }
             }
             br.close();
