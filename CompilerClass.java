@@ -2,7 +2,7 @@
 /*
 Compiler Construction Project 
 
-Author: Muhammad Ahsan 1912310 Section F
+Author: Muhammad Ahsan 1912310 Section 5F BSCS
 Language: Java 
 Compiled on: JavaSE-13
 Development Resources Used: Microsoft Visual Studio Code with Redhat Java Extension 
@@ -128,11 +128,143 @@ public class CompilerClass {
                         System.out.println("String : " + lexeme);
                         // Clearing the lexeme once it's returned
                         lexeme = "";
+                    } else if (Character.isWhitespace(line.charAt(i))) {
+                        // Do nothing
+                    } else if (line.charAt(i) == '<') {
+                        lexeme += line.charAt(i++);
+                        while (i < line.length()) {
+                            lexeme += line.charAt(i++);
+                            if (lexeme.matches("<>") || lexeme.matches("<=") || lexeme.matches("<.*")) {
+                                break;
+                            }
+
+                        }
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("ro : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    } else if (line.charAt(i) == '>') {
+                        lexeme += line.charAt(i++);
+                        while (i < line.length()) {
+                            lexeme += line.charAt(i++);
+                            if (lexeme.matches(">=") || lexeme.matches(">.*")) {
+                                break;
+                            }
+
+                        }
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("ro : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    } else if (line.charAt(i) == '+') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("ao : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == '-') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("ao : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == '*') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("ao : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == '/') {
+                        lexeme += line.charAt(i++);
+
+                        // Taking the pointer to one step back
+                        while (i < line.length()) {
+
+                            lexeme += line.charAt(i);
+                            i++;
+                            if (lexeme.matches("/ ")) {
+                                // Returning the op
+                                break;
+                            }
+                        }
+                        if (lexeme.startsWith("//")) {
+                            System.out.println("comment: " + lexeme);
+                        } else {
+                            System.out.println("divide: " + lexeme);
+                        }
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == '=') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == '(') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+
+                    } else if (line.charAt(i) == ')') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    } else if (line.charAt(i) == '{') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    } else if (line.charAt(i) == '}') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
+                    } else if (line.charAt(i) == ';') {
+                        lexeme += line.charAt(i++);
+                        // Taking the pointer to one step back
+                        i--;
+                        // Returning the op
+                        System.out.println("oo : " + lexeme);
+                        // Clearing the lexeme once it's returned
+                        lexeme = "";
                     }
+
                 }
             }
             br.close();
         } catch (
+
         // Exception handling
         FileNotFoundException e) {
             e.printStackTrace();
