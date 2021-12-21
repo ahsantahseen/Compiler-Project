@@ -82,7 +82,15 @@ public class CompilerClass {
             // Init Line Number to start from 1
             int lineNumber = 1;
             // Attribute Values for Token in Symbol Table
-            int attributeValue = 0;
+            int attributeValue = 7;
+            // Storing Keywords in Symbol Table
+            addToken(0, "int", "-", "-");
+            addToken(1, "char", "-", "-");
+            addToken(2, "string", "-", "-");
+            addToken(3, "if", "-", "-");
+            addToken(4, "else", "-", "-");
+            addToken(5, "do", "-", "-");
+            addToken(6, "while", "-", "-");
             // While looop until we don't have any lines
             while ((line = br.readLine()) != null) {
                 System.out.println();
@@ -114,8 +122,8 @@ public class CompilerClass {
                         // If our lexeme is a keyword we are returning it as a keyword
                         if (iskeyword(lexeme)) {
                             System.out.println("Keyword: " + lexeme);
-                            addToken(attributeValue, lexeme, "-", "-");
-                            attributeValue++;
+                            // addToken(attributeValue, lexeme, "-", "-");
+                            // attributeValue++;
                         }
                         // Otherwise we are returning it as a identifier
                         else {
@@ -141,7 +149,7 @@ public class CompilerClass {
                         // Taking the pointer to one step back
                         i--;
                         // Returning the number
-                        addToken(attributeValue, "in", "-", lexeme);
+                        addToken(attributeValue, "in", "-", "-");
                         attributeValue++;
                         System.out.println("Number : " + lexeme);
                         // Clearing the lexeme once it's returned
@@ -329,12 +337,14 @@ public class CompilerClass {
         }
     }
 
+    // Function To Print Symbol Table
     public void printLexicalSymbolTable() {
         System.out.println("---------------------------------------------");
         System.out.println("                SYMBOL TABLE                 ");
         System.out.println("---------------------------------------------");
         System.out.println("|Attribute Value | Token Name | Type | Value|");
         System.out.println("---------------------------------------------");
+        // Looping through the arrayList
         for (Token token : SymbolTable) {
             System.out.println(token.toString());
         }
