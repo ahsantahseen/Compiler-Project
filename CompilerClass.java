@@ -14,9 +14,33 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
+class Token {
+    private int attributeValue;
+    private String TokenName;
+    private String Type;
+    private String Value;
+
+    public Token(int attributeValue, String TokenName, String Type, String Value) {
+        this.attributeValue = attributeValue;
+        this.TokenName = TokenName;
+        this.Type = Type;
+        this.Value = Value;
+    }
+
+    @Override
+    public String toString() {
+        return "| " + attributeValue + " | " + TokenName + " | " + Type + " | " + Value + " | ";
+    }
+}
+
 public class CompilerClass {
+
+    static ArrayList<Token> SymbolTable = new ArrayList<Token>();
+
+    // ===== Utility Methods=======//
 
     /*
      * Function that checks whether the lexeme is one of the keywords that we have
@@ -36,6 +60,13 @@ public class CompilerClass {
         return false;
     }
 
+    // Method to insert Token into Symbol Table
+    static void addToken(int attributeValue, String TokenName, String Type, String Value) {
+
+        SymbolTable.add(new Token(attributeValue, TokenName, Type, Value));
+    }
+
+    // ======= EOUM =======//
     // Function for lexical analysis
     public void lexicalAnalysis() {
         System.out.println("Lexical Analysis");
@@ -50,10 +81,17 @@ public class CompilerClass {
             String line;
             // Init Line Number to start from 1
             int lineNumber = 1;
+            // Attribute Values for Token in Symbol Table
+            int attributeValue = 0;
             // While looop until we don't have any lines
             while ((line = br.readLine()) != null) {
+                System.out.println();
+                System.out.println("=============");
                 System.out.println("Line#" + lineNumber++);
+                System.out.println();
                 System.out.println(line);
+                System.out.println();
+                System.out.println("=============");
                 // Init lexeme with an empty string
                 String lexeme = "";
                 // Looping through each character of the line
@@ -76,10 +114,14 @@ public class CompilerClass {
                         // If our lexeme is a keyword we are returning it as a keyword
                         if (iskeyword(lexeme)) {
                             System.out.println("Keyword: " + lexeme);
+                            addToken(attributeValue, lexeme, "-", "-");
+                            attributeValue++;
                         }
                         // Otherwise we are returning it as a identifier
                         else {
                             System.out.println("Identifier: " + lexeme);
+                            addToken(attributeValue, "id", "-", lexeme);
+                            attributeValue++;
                         }
                         // Clearing the lexeme once it's returned
                         lexeme = "";
@@ -99,6 +141,8 @@ public class CompilerClass {
                         // Taking the pointer to one step back
                         i--;
                         // Returning the number
+                        addToken(attributeValue, "in", "-", lexeme);
+                        attributeValue++;
                         System.out.println("Number : " + lexeme);
                         // Clearing the lexeme once it's returned
                         lexeme = "";
@@ -126,6 +170,8 @@ public class CompilerClass {
                         // starts from 2nd index to 2nd last index
                         lexeme = lexeme.substring(1, lexeme.length() - 1);
                         System.out.println("String : " + lexeme);
+                        addToken(attributeValue, "sl", "-", lexeme);
+                        attributeValue++;
                         // Clearing the lexeme once it's returned
                         lexeme = "";
                     } else if (Character.isWhitespace(line.charAt(i))) {
@@ -267,7 +313,7 @@ public class CompilerClass {
                         // Error Handling for unrecognized lexemes
                         lexeme += line.charAt(i);
                         System.out.println("Error: Unrecognized Lexeme: " + lexeme);
-                        System.out.println("Line: " + lineNumber);
+                        System.out.println("Line: " + (lineNumber - 1));
                         lexeme = "";
                     }
                 }
@@ -280,6 +326,17 @@ public class CompilerClass {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void printLexicalSymbolTable() {
+        System.out.println("---------------------------------------------");
+        System.out.println("                SYMBOL TABLE                 ");
+        System.out.println("---------------------------------------------");
+        System.out.println("|Attribute Value | Token Name | Type | Value|");
+        System.out.println("---------------------------------------------");
+        for (Token token : SymbolTable) {
+            System.out.println(token.toString());
         }
     }
 
@@ -313,6 +370,8 @@ public class CompilerClass {
         // choice is 2 go for both combo otherwise show error
         if (choice == 1) {
             obj.lexicalAnalysis();
+            obj.printLexicalSymbolTable();
+
         } else if (choice == 2) {
             obj.lexicalAndSyntaxAnalysis();
         } else {
