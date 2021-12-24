@@ -4,7 +4,7 @@ Compiler Construction Project
 
 Author: Muhammad Ahsan 1912310 Section 5F BSCS
 Language: Java 
-Compiled with: JavaSE-13
+Compiled with: JavaSE-13/ JDK-11
 Development Resources Used: Microsoft Visual Studio Code with Redhat Java Extension 
 
 */
@@ -32,7 +32,11 @@ class Token {
 
     @Override
     public String toString() {
-        return "| " + attributeValue + " | " + TokenName + " | " + Type + " | " + Value + " | ";
+        if (TokenName.length() < 5) {
+            return " " + attributeValue + " \t\t | " + TokenName + "\t\t|" + Type + " \t| " + Value + " \t    ";
+        } else {
+            return " " + attributeValue + " \t\t | " + TokenName + "\t|" + Type + " \t| " + Value + "\t    ";
+        }
     }
 }
 
@@ -66,19 +70,290 @@ public class CompilerClass {
         SymbolTable.add(new Token(attributeValue, TokenName, Type, Value));
     }
 
+    // ----Tokenizer-----//
+    static void Tokenizer(String line, int lineNumber, int attributeValue) {
+        System.out.println();
+        System.out.println("=============");
+        System.out.println("Line#" + lineNumber++);
+        System.out.println();
+        System.out.println(line);
+        System.out.println();
+        System.out.println("=============");
+        // Init lexeme with an empty string
+        String lexeme = "";
+        // Looping through each character of the line
+        for (int i = 0; i < line.length(); i++) {
+            // Condition to check for identifiers and keywords
+            if (Character.isLetter(line.charAt(i))) {
+                /*
+                 * Here we are concatinating the lexeme with the next char,
+                 * and then we are running a while loop until the length of the line (string)
+                 * and a character must be a letter or a digit or even _ which is used for
+                 * variables naming we then concate the lexeme
+                 */
+                lexeme += line.charAt(i++);
+                while (i < line.length()
+                        && (Character.isLetterOrDigit(line.charAt(i)) || line.charAt(i) == '_')) {
+                    lexeme += line.charAt(i++);
+                }
+                // Taking the pointer to one step back
+                i--;
+                // If our lexeme is a keyword we are returning it as a keyword
+                if (iskeyword(lexeme)) {
+                    System.out.println("Keyword: " + lexeme);
+                    // addToken(attributeValue, lexeme, "-", "-");
+                    // attributeValue++;
+                }
+                // Otherwise we are returning it as a identifier
+                else {
+                    System.out.println("Identifier: " + lexeme);
+                    addToken(attributeValue, "id", "-", lexeme);
+                    attributeValue++;
+                }
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            }
+            // Condition to check for integer values
+            else if (Character.isDigit(line.charAt(i))) {
+                /*
+                 * Here we are contactinating the lexeme with the next char,
+                 * and then we are running a while loop until length of the line (string)
+                 * and the character must be a digit and concatinating the lexeme
+                 * 
+                 */
+                lexeme += line.charAt(i++);
+                while (i < line.length() && (Character.isDigit(line.charAt(i)))) {
+                    lexeme += line.charAt(i++);
+                }
+                // Taking the pointer to one step back
+                i--;
+                // Returning the number
+                addToken(attributeValue, "in", "-", lexeme);
+                attributeValue++;
+                System.out.println("Number : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            }
+            // Condition to check for Strings
+            else if (line.charAt(i) == '"') {
+                /*
+                 * Here we are contactinating the lexeme with the next char,
+                 * and then we are running a while loop until length of the line (string)
+                 * and concatinating the lexeme, we are using an Regex (regular expression) that
+                 * checks if our lexeme is a string or not by simply that if anything is between
+                 * quotes "" then instantly break loop because our string has been formed
+                 * 
+                 */
+                lexeme += line.charAt(i++);
+                while (i < line.length()) {
+                    lexeme += line.charAt(i++);
+                    if (lexeme.matches("\".*\"")) {
+                        break;
+                    }
+                }
+                // Taking the pointer to one step back
+                i--;
+                // Returning the string with trimming out the "" by creating a substring that
+                // starts from 2nd index to 2nd last index
+                lexeme = lexeme.substring(1, lexeme.length() - 1);
+                System.out.println("String : " + lexeme);
+                addToken(attributeValue, "sl", "-", lexeme);
+                attributeValue++;
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (Character.isWhitespace(line.charAt(i))) {
+                // Do nothing
+            } else if (line.charAt(i) == '<') {
+                lexeme += line.charAt(i++);
+                while (i < line.length()) {
+                    lexeme += line.charAt(i++);
+                    if (lexeme.matches("<>") || lexeme.matches("<=") || lexeme.matches("<.*")) {
+                        break;
+                    }
+
+                }
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("ro : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (line.charAt(i) == '>') {
+                lexeme += line.charAt(i++);
+                while (i < line.length()) {
+                    lexeme += line.charAt(i++);
+                    if (lexeme.matches(">=") || lexeme.matches(">.*")) {
+                        break;
+                    }
+
+                }
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("ro : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (line.charAt(i) == '+') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("ao : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            } else if (line.charAt(i) == '-') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("ao : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            } else if (line.charAt(i) == '*') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("ao : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            }
+            // Here we are defining condition for divide and single line comments
+            else if (line.charAt(i) == '/') {
+                // Storing into lexeme
+                lexeme += line.charAt(i++);
+                // Looping through the line
+                while (i < line.length()) {
+                    // Concatinating lexeme
+                    lexeme += line.charAt(i);
+                    // Increment the pointer
+                    i++;
+                    // Regex for matching
+                    if (lexeme.matches("/ ")) {
+                        // Returning the op
+                        break;
+                    }
+                }
+                // Seprator Logic between divide and comments
+                if (lexeme.startsWith("//")) {
+                    System.out.println("comment: " + lexeme);
+                } else {
+                    System.out.println("divide: " + lexeme);
+                }
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            } else if (line.charAt(i) == '=') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            } else if (line.charAt(i) == '(') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
+            } else if (line.charAt(i) == ')') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (line.charAt(i) == '{') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (line.charAt(i) == '}') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else if (line.charAt(i) == ';') {
+                lexeme += line.charAt(i++);
+                // Taking the pointer to one step back
+                i--;
+                // Returning the op
+                System.out.println("oo : " + lexeme);
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+            } else {
+                // Error Handling for unrecognized lexemes
+                lexeme += line.charAt(i);
+                System.out.println("Error: Unrecognized Lexeme: " + lexeme);
+                System.out.println("Line: " + (lineNumber - 1));
+                lexeme = "";
+            }
+        }
+    }
+
     // ======= EOUM =======//
     // Function for lexical analysis
-    public void lexicalAnalysis() {
+    public void lexicalAnalysis(int mode) {
         System.out.println("Lexical Analysis");
-        try {
-            // Creating File Object for our file
-            File fileObject = new File("input.txt");
-            // Creating File Reader for our file Object
-            FileReader fileReader = new FileReader(fileObject);
-            // Creating Buffered Reader for our file Reader
-            BufferedReader br = new BufferedReader(fileReader);
-            // Creating Line String
-            String line;
+        if (mode == 0) {
+            try {
+                // Creating File Object for our file
+                File fileObject = new File("input.txt");
+                // Creating File Reader for our file Object
+                FileReader fileReader = new FileReader(fileObject);
+                // Creating Buffered Reader for our file Reader
+                BufferedReader br = new BufferedReader(fileReader);
+                // Creating Line String
+                String line;
+                // Init Line Number to start from 1
+                int lineNumber = 1;
+                // Attribute Values for Token in Symbol Table
+                int attributeValue = 7;
+                // Storing Keywords in Symbol Table
+                addToken(0, "int", "-", "-");
+                addToken(1, "char", "-", "-");
+                addToken(2, "string", "-", "-");
+                addToken(3, "if", "-", "-");
+                addToken(4, "else", "-", "-");
+                addToken(5, "do", "-", "-");
+                addToken(6, "while", "-", "-");
+                // While looop until we don't have any lines
+                while ((line = br.readLine()) != null) {
+                    Tokenizer(line, lineNumber, attributeValue);
+                    lineNumber++;
+                    attributeValue++;
+                }
+                br.close();
+            } catch (
+
+            // Exception handling
+            FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (mode == 1) {
+
+            Scanner input = new Scanner(System.in);
+            System.out.println("Enter a line: ");
+            String line = "";
+            line = input.next() + input.nextLine();
+
             // Init Line Number to start from 1
             int lineNumber = 1;
             // Attribute Values for Token in Symbol Table
@@ -91,259 +366,20 @@ public class CompilerClass {
             addToken(4, "else", "-", "-");
             addToken(5, "do", "-", "-");
             addToken(6, "while", "-", "-");
-            // While looop until we don't have any lines
-            while ((line = br.readLine()) != null) {
-                System.out.println();
-                System.out.println("=============");
-                System.out.println("Line#" + lineNumber++);
-                System.out.println();
-                System.out.println(line);
-                System.out.println();
-                System.out.println("=============");
-                // Init lexeme with an empty string
-                String lexeme = "";
-                // Looping through each character of the line
-                for (int i = 0; i < line.length(); i++) {
-                    // Condition to check for identifiers and keywords
-                    if (Character.isLetter(line.charAt(i))) {
-                        /*
-                         * Here we are concatinating the lexeme with the next char,
-                         * and then we are running a while loop until the length of the line (string)
-                         * and a character must be a letter or a digit or even _ which is used for
-                         * variables naming we then concate the lexeme
-                         */
-                        lexeme += line.charAt(i++);
-                        while (i < line.length()
-                                && (Character.isLetterOrDigit(line.charAt(i)) || line.charAt(i) == '_')) {
-                            lexeme += line.charAt(i++);
-                        }
-                        // Taking the pointer to one step back
-                        i--;
-                        // If our lexeme is a keyword we are returning it as a keyword
-                        if (iskeyword(lexeme)) {
-                            System.out.println("Keyword: " + lexeme);
-                            // addToken(attributeValue, lexeme, "-", "-");
-                            // attributeValue++;
-                        }
-                        // Otherwise we are returning it as a identifier
-                        else {
-                            System.out.println("Identifier: " + lexeme);
-                            addToken(attributeValue, "id", "-", lexeme);
-                            attributeValue++;
-                        }
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    }
-                    // Condition to check for integer values
-                    else if (Character.isDigit(line.charAt(i))) {
-                        /*
-                         * Here we are contactinating the lexeme with the next char,
-                         * and then we are running a while loop until length of the line (string)
-                         * and the character must be a digit and concatinating the lexeme
-                         * 
-                         */
-                        lexeme += line.charAt(i++);
-                        while (i < line.length() && (Character.isDigit(line.charAt(i)))) {
-                            lexeme += line.charAt(i++);
-                        }
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the number
-                        addToken(attributeValue, "in", "-", "-");
-                        attributeValue++;
-                        System.out.println("Number : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    }
-                    // Condition to check for Strings
-                    else if (line.charAt(i) == '"') {
-                        /*
-                         * Here we are contactinating the lexeme with the next char,
-                         * and then we are running a while loop until length of the line (string)
-                         * and concatinating the lexeme, we are using an Regex (regular expression) that
-                         * checks if our lexeme is a string or not by simply that if anything is between
-                         * quotes "" then instantly break loop because our string has been formed
-                         * 
-                         */
-                        lexeme += line.charAt(i++);
-                        while (i < line.length()) {
-                            lexeme += line.charAt(i++);
-                            if (lexeme.matches("\".*\"")) {
-                                break;
-                            }
-                        }
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the string with trimming out the "" by creating a substring that
-                        // starts from 2nd index to 2nd last index
-                        lexeme = lexeme.substring(1, lexeme.length() - 1);
-                        System.out.println("String : " + lexeme);
-                        addToken(attributeValue, "sl", "-", lexeme);
-                        attributeValue++;
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (Character.isWhitespace(line.charAt(i))) {
-                        // Do nothing
-                    } else if (line.charAt(i) == '<') {
-                        lexeme += line.charAt(i++);
-                        while (i < line.length()) {
-                            lexeme += line.charAt(i++);
-                            if (lexeme.matches("<>") || lexeme.matches("<=") || lexeme.matches("<.*")) {
-                                break;
-                            }
-
-                        }
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("ro : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (line.charAt(i) == '>') {
-                        lexeme += line.charAt(i++);
-                        while (i < line.length()) {
-                            lexeme += line.charAt(i++);
-                            if (lexeme.matches(">=") || lexeme.matches(">.*")) {
-                                break;
-                            }
-
-                        }
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("ro : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (line.charAt(i) == '+') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("ao : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    } else if (line.charAt(i) == '-') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("ao : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    } else if (line.charAt(i) == '*') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("ao : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    }
-                    // Here we are defining condition for divide and single line comments
-                    else if (line.charAt(i) == '/') {
-                        // Storing into lexeme
-                        lexeme += line.charAt(i++);
-                        // Looping through the line
-                        while (i < line.length()) {
-                            // Concatinating lexeme
-                            lexeme += line.charAt(i);
-                            // Increment the pointer
-                            i++;
-                            // Regex for matching
-                            if (lexeme.matches("/ ")) {
-                                // Returning the op
-                                break;
-                            }
-                        }
-                        // Seprator Logic between divide and comments
-                        if (lexeme.startsWith("//")) {
-                            System.out.println("comment: " + lexeme);
-                        } else {
-                            System.out.println("divide: " + lexeme);
-                        }
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    } else if (line.charAt(i) == '=') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    } else if (line.charAt(i) == '(') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-
-                    } else if (line.charAt(i) == ')') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (line.charAt(i) == '{') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (line.charAt(i) == '}') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else if (line.charAt(i) == ';') {
-                        lexeme += line.charAt(i++);
-                        // Taking the pointer to one step back
-                        i--;
-                        // Returning the op
-                        System.out.println("oo : " + lexeme);
-                        // Clearing the lexeme once it's returned
-                        lexeme = "";
-                    } else {
-                        // Error Handling for unrecognized lexemes
-                        lexeme += line.charAt(i);
-                        System.out.println("Error: Unrecognized Lexeme: " + lexeme);
-                        System.out.println("Line: " + (lineNumber - 1));
-                        lexeme = "";
-                    }
-                }
-            }
-            br.close();
-        } catch (
-
-        // Exception handling
-        FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            Tokenizer(line, lineNumber, attributeValue);
+            input.close();
+        } else {
+            System.out.println("Incorrect Mode");
         }
     }
 
     // Function To Print Symbol Table
     public void printLexicalSymbolTable() {
-        System.out.println("---------------------------------------------");
+        System.out.println("----------------------------------------------------");
         System.out.println("                SYMBOL TABLE                 ");
-        System.out.println("---------------------------------------------");
-        System.out.println("|Attribute Value | Token Name | Type | Value|");
-        System.out.println("---------------------------------------------");
+        System.out.println("----------------------------------------------------");
+        System.out.println("|Attribute Value |  Token Name  | Type |   Value   |");
+        System.out.println("----------------------------------------------------");
         // Looping through the arrayList
         for (Token token : SymbolTable) {
             System.out.println(token.toString());
@@ -351,8 +387,8 @@ public class CompilerClass {
     }
 
     // Function for lexical and Syntax analysis
-    public void lexicalAndSyntaxAnalysis() {
-        System.out.println("Lexical + Syntax");
+    public void SyntaxAnalysis() {
+        System.out.println("Syntax");
     }
 
     // Main Function
@@ -375,15 +411,17 @@ public class CompilerClass {
         System.out.println("2. Lexical Analysis and Syntax Analysis ");
         System.out.print("Please Select Your Choice:");
         int choice = sc.nextInt();
-        sc.close();
+
         // Basic Menu Coditions if our choice is 1 go to lexical other wise if our
         // choice is 2 go for both combo otherwise show error
         if (choice == 1) {
-            obj.lexicalAnalysis();
+            obj.lexicalAnalysis(0);
             obj.printLexicalSymbolTable();
 
         } else if (choice == 2) {
-            obj.lexicalAndSyntaxAnalysis();
+            obj.lexicalAnalysis(1);
+            obj.printLexicalSymbolTable();
+            obj.SyntaxAnalysis();
         } else {
             System.out.println("Error Wrong Choice");
         }
