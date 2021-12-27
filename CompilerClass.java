@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
 
 class Token {
     private int attributeValue;
@@ -43,6 +44,45 @@ class Token {
 public class CompilerClass {
 
     static ArrayList<Token> SymbolTable = new ArrayList<Token>();
+    static String ActionTable[][] = {
+            { "s5", "error", "error", "s4", "error", "error" },
+            { "error", "s6", "error", "error", "error", "accept" },
+            { "error", "r2", "s7", "error", "r2", "r2" },
+            { "error", "r4", "r4", "error", "r4", "r4" },
+            { "s5", "error", "error", "s4", "error", "error" },
+            { "error", "r6", "r6", "error", "r6", "r6" },
+            { "s5", "error", "error", "s4", "error", "error" },
+            { "s5", "error", "error", "s4", "error", "error" },
+            { "error", "s6", "error", "error", "s11", "error" },
+            { "error", "r1", "s7", "error", "r1", "r1" },
+            { "error", "r3", "r3", "error", "r3", "r3" },
+            { "error", "r5", "r5", "error", "r5", "r5" },
+    };
+    static String GotoTable[][] = {
+            { "1", "2", "3" },
+            { "error", "error", "error" },
+            { "error", "error", "error" },
+            { "error", "error", "error" },
+            { "8", "2", "3" },
+            { "error", "error", "error" },
+            { "error", "9", "3" },
+            { "error", "error", "10" },
+            { "error", "error", "error" },
+            { "error", "error", "error" },
+            { "error", "error", "error" },
+            { "error", "error", "error" },
+    };
+    static String Grammer[][] = {
+            { "E", "E", "+", "T" },
+            { "E", "T" },
+            { "T", "T", "*", "F" },
+            { "T", "F" },
+            { "F", "(", "E", ")" },
+            { "F", "id" },
+    };
+    static ArrayList<String> InputBuffer = new ArrayList<String>();
+    static Stack<String> CurrentStack = new Stack<String>();
+    static int InputBufferPointer = 0;
 
     // ===== Utility Methods=======//
 
@@ -68,6 +108,27 @@ public class CompilerClass {
     static void addToken(int attributeValue, String TokenName, String Type, String Value) {
 
         SymbolTable.add(new Token(attributeValue, TokenName, Type, Value));
+    }
+
+    // Index Calculator For Stack Peek
+    static int IndexStackPeek(String topOfStack) {
+        if (topOfStack.equals("id") || topOfStack.equals("E")) {
+            return 0;
+        } else if (topOfStack.equals("+") || topOfStack.equals("T")) {
+            return 1;
+        } else if (topOfStack.equals("*") || topOfStack.equals("F")) {
+            return 2;
+        } else if (topOfStack.equals("(")) {
+            return 3;
+        } else if (topOfStack.equals(")")) {
+            return 4;
+        } else if (topOfStack.equals("$")) {
+            return 5;
+        } else if (topOfStack.matches("\\d+")) {
+            return Integer.parseInt(topOfStack);
+        } else {
+            return -1;
+        }
     }
 
     // ----Tokenizer-----//
@@ -109,6 +170,7 @@ public class CompilerClass {
                     System.out.println("Identifier: " + lexeme);
                     addToken(attributeValue, "id", "-", lexeme);
                     attributeValue++;
+                    InputBuffer.add("id");
                 }
                 // Clearing the lexeme once it's returned
                 lexeme = "";
@@ -201,6 +263,7 @@ public class CompilerClass {
                 System.out.println("ao : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("+");
 
             } else if (line.charAt(i) == '-') {
                 lexeme += line.charAt(i++);
@@ -219,6 +282,7 @@ public class CompilerClass {
                 System.out.println("ao : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("*");
 
             }
             // Here we are defining condition for divide and single line comments
@@ -263,6 +327,7 @@ public class CompilerClass {
                 System.out.println("oo : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("(");
 
             } else if (line.charAt(i) == ')') {
                 lexeme += line.charAt(i++);
@@ -272,6 +337,8 @@ public class CompilerClass {
                 System.out.println("oo : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add(")");
+
             } else if (line.charAt(i) == '{') {
                 lexeme += line.charAt(i++);
                 // Taking the pointer to one step back
@@ -389,6 +456,92 @@ public class CompilerClass {
     // Function for lexical and Syntax analysis
     public void SyntaxAnalysis() {
         System.out.println("Syntax");
+        InputBuffer.add("$");
+        CurrentStack.push("0");
+        String input = InputBuffer.get(InputBufferPointer);
+        int i = 0;
+        while (true) {
+            input = InputBuffer.get(InputBufferPointer);
+            String topOfStack = CurrentStack.peek();
+            // Debug Lines are commented
+            // System.out.println(topOfStack);
+            System.out.println(CurrentStack.toString());
+            int s = IndexStackPeek(topOfStack);
+
+            int BufferIndexEquivalent;
+            if (input.equals("id")) {
+                BufferIndexEquivalent = 0;
+            } else if (input.equals("+")) {
+                BufferIndexEquivalent = 1;
+            } else if (input.equals("*")) {
+                BufferIndexEquivalent = 2;
+            } else if (input.equals("(")) {
+                BufferIndexEquivalent = 3;
+            } else if (input.equals(")")) {
+                BufferIndexEquivalent = 4;
+            } else if (input.equals("$")) {
+                BufferIndexEquivalent = 5;
+            } else {
+                BufferIndexEquivalent = -1;
+            }
+            if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
+                // System.out.println("Shift State");
+                String ShiftState = ActionTable[s][BufferIndexEquivalent].substring(1);
+                // System.out.println("Shift " + ShiftState);
+                CurrentStack.push(input);
+                CurrentStack.push(ShiftState);
+                InputBufferPointer++;
+                // System.out.println(CurrentStack.toString());
+            } else if (ActionTable[s][BufferIndexEquivalent].startsWith("r")) {
+                // System.out.println("Reduce State");
+                String reduceState = ActionTable[s][BufferIndexEquivalent].substring(1);
+                // System.out.println("reduce " + reduceState);
+                int popLen = Grammer[Integer.parseInt(reduceState) - 1].length;
+                // System.out.println("len: " + (popLen - 1));
+                for (int j = 1; j < 2 * popLen - 1; j++) {
+                    CurrentStack.pop();
+                }
+                topOfStack = CurrentStack.peek();
+                int topOfStackIndexEquivalent = IndexStackPeek(topOfStack);
+                CurrentStack.push(Grammer[Integer.parseInt(reduceState) - 1][0]);
+                // System.out.println(CurrentStack.toString());
+                int GrammerSymbolIndexEquivalent;
+
+                if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("E")) {
+                    GrammerSymbolIndexEquivalent = 0;
+                } else if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("T")) {
+                    GrammerSymbolIndexEquivalent = 1;
+                } else if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("F")) {
+                    GrammerSymbolIndexEquivalent = 2;
+                } else {
+                    GrammerSymbolIndexEquivalent = -1;
+                }
+                // System.out.println("SS: " + topOfStackIndexEquivalent);
+                // System.out.println("GS: " + GrammerSymbolIndexEquivalent);
+                // Error Here Need Correct Indexing here
+                // System.out.println("Pushing: " +
+                // GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
+                CurrentStack.push(GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
+                // System.out.println("After Goto: " + CurrentStack.toString());
+                System.out.println();
+                for (int z = 0; z < Grammer[Integer.parseInt(reduceState) - 1].length; z++) {
+                    if (z == 0) {
+                        System.out.print(
+                                Grammer[Integer.parseInt(reduceState) - 1][z] + "-->");
+                    } else {
+                        System.out.print(
+                                Grammer[Integer.parseInt(reduceState) - 1][z]);
+                    }
+                }
+                System.out.println();
+            } else if (ActionTable[s][BufferIndexEquivalent].equals("accept")) {
+                System.out.println("Compiled!");
+                break;
+            } else {
+                System.out.println("Error");
+                break;
+            }
+        }
     }
 
     // Main Function
