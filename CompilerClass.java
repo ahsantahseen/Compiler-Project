@@ -409,9 +409,6 @@ public class CompilerClass {
     // ======= EOUM =======//
     // Function for lexical analysis
     public void lexicalAnalysis(int mode) {
-        System.out.println("----------------------------------------------------");
-        System.out.println("                LEXICAL ANALYSIS      ");
-        System.out.println("----------------------------------------------------");
         if (mode == 0) {
             try {
                 // Creating File Object for our file
@@ -434,6 +431,9 @@ public class CompilerClass {
                 addToken(4, "else", "-", "-");
                 addToken(5, "do", "-", "-");
                 addToken(6, "while", "-", "-");
+                System.out.println("----------------------------------------------------");
+                System.out.println("                LEXICAL ANALYSIS      ");
+                System.out.println("----------------------------------------------------");
                 // While looop until we don't have any lines
                 while ((line = br.readLine()) != null) {
                     Tokenizer(line, lineNumber, attributeValue);
@@ -468,6 +468,9 @@ public class CompilerClass {
             addToken(4, "else", "-", "-");
             addToken(5, "do", "-", "-");
             addToken(6, "while", "-", "-");
+            System.out.println("----------------------------------------------------");
+            System.out.println("                LEXICAL ANALYSIS      ");
+            System.out.println("----------------------------------------------------");
             Tokenizer(line, lineNumber, attributeValue);
             input.close();
         } else {
