@@ -131,6 +131,39 @@ public class CompilerClass {
         }
     }
 
+    // Index Calculator For Buffer Input
+    static int IndexBufferInput(String input) {
+        if (input.equals("id")) {
+            return 0;
+        } else if (input.equals("+")) {
+            return 1;
+        } else if (input.equals("*")) {
+            return 2;
+        } else if (input.equals("(")) {
+            return 3;
+        } else if (input.equals(")")) {
+            return 4;
+        } else if (input.equals("$")) {
+            return 5;
+        } else {
+            return -1;
+        }
+    }
+
+    // Index Calculator For Production Head in Grammer
+    static int GrammerSymbolIndex(String head) {
+
+        if (head.equals("E")) {
+            return 0;
+        } else if (head.equals("T")) {
+            return 1;
+        } else if (head.equals("F")) {
+            return 2;
+        } else {
+            return -1;
+        }
+    }
+
     // ----Tokenizer-----//
     static void Tokenizer(String line, int lineNumber, int attributeValue) {
         System.out.println();
@@ -302,7 +335,7 @@ public class CompilerClass {
                     }
                 }
                 // Seprator Logic between divide and comments
-                if (lexeme.startsWith("//")) {
+                if (lexeme.startsWith("//") || lexeme.startsWith("/*")) {
                     System.out.println("comment: " + lexeme);
                 } else {
                     System.out.println("divide: " + lexeme);
@@ -376,7 +409,9 @@ public class CompilerClass {
     // ======= EOUM =======//
     // Function for lexical analysis
     public void lexicalAnalysis(int mode) {
-        System.out.println("Lexical Analysis");
+        System.out.println("----------------------------------------------------");
+        System.out.println("                LEXICAL ANALYSIS      ");
+        System.out.println("----------------------------------------------------");
         if (mode == 0) {
             try {
                 // Creating File Object for our file
@@ -455,75 +490,74 @@ public class CompilerClass {
 
     // Function for lexical and Syntax analysis
     public void SyntaxAnalysis() {
-        System.out.println("Syntax");
+        System.out.println("----------------------------------------------------");
+        System.out.println("                SYNTAX ANALYSIS      ");
+        System.out.println("----------------------------------------------------");
+        // Adding $ in the end of the Input Buffer
         InputBuffer.add("$");
+        // Pushing 0 as the start state in our stack
         CurrentStack.push("0");
+        // Getting Input from InputBuffer
         String input = InputBuffer.get(InputBufferPointer);
-        int i = 0;
+        // Running Infinite Loop
         while (true) {
+            // Getting Input from InputBuffer
             input = InputBuffer.get(InputBufferPointer);
+            // Getting Top of the stack
             String topOfStack = CurrentStack.peek();
-            // Debug Lines are commented
-            // System.out.println(topOfStack);
+            // Printing The Current Stack
             System.out.println(CurrentStack.toString());
+            /**
+             * Here I am using various Index calculator functions that i made because
+             * of my data structure to access 2D arrays i need index values rather than
+             * the value itself so i am using functions that i made that calculates the
+             * index
+             * according the given input (Utility Functions are defined Above in the class
+             * as static functions)
+             * 
+             */
             int s = IndexStackPeek(topOfStack);
+            int BufferIndexEquivalent = IndexBufferInput(input);
 
-            int BufferIndexEquivalent;
-            if (input.equals("id")) {
-                BufferIndexEquivalent = 0;
-            } else if (input.equals("+")) {
-                BufferIndexEquivalent = 1;
-            } else if (input.equals("*")) {
-                BufferIndexEquivalent = 2;
-            } else if (input.equals("(")) {
-                BufferIndexEquivalent = 3;
-            } else if (input.equals(")")) {
-                BufferIndexEquivalent = 4;
-            } else if (input.equals("$")) {
-                BufferIndexEquivalent = 5;
-            } else {
-                BufferIndexEquivalent = -1;
-            }
+            // This is the condition for shift move
             if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
-                // System.out.println("Shift State");
+                // Retriveing Which State to shift
                 String ShiftState = ActionTable[s][BufferIndexEquivalent].substring(1);
-                // System.out.println("Shift " + ShiftState);
+                // Pushing Input Value of Buffer and the shift state
                 CurrentStack.push(input);
                 CurrentStack.push(ShiftState);
+                // Incrementing to the next input in the buffer using this pointer variable
                 InputBufferPointer++;
-                // System.out.println(CurrentStack.toString());
-            } else if (ActionTable[s][BufferIndexEquivalent].startsWith("r")) {
-                // System.out.println("Reduce State");
+            }
+            // This is the condition for reduce state
+            else if (ActionTable[s][BufferIndexEquivalent].startsWith("r")) {
+                // Retriveing Which State to reduce
                 String reduceState = ActionTable[s][BufferIndexEquivalent].substring(1);
-                // System.out.println("reduce " + reduceState);
+                // Calculating the Pop length
                 int popLen = Grammer[Integer.parseInt(reduceState) - 1].length;
-                // System.out.println("len: " + (popLen - 1));
+                // Popping from stack according the length
                 for (int j = 1; j < 2 * popLen - 1; j++) {
                     CurrentStack.pop();
                 }
+                // Updating the top of the stack value
                 topOfStack = CurrentStack.peek();
+                /**
+                 * Here I am using various Index calculator functions that i made because
+                 * of my data structure to access 2D arrays i need index values rather than
+                 * the value itself so i am using functions that i made that calculates the
+                 * index
+                 * according the given input (Utility Functions are defined Above in the class
+                 * as static functions)
+                 * 
+                 */
                 int topOfStackIndexEquivalent = IndexStackPeek(topOfStack);
+                // Pushing The Symbol in the Stack
                 CurrentStack.push(Grammer[Integer.parseInt(reduceState) - 1][0]);
-                // System.out.println(CurrentStack.toString());
-                int GrammerSymbolIndexEquivalent;
-
-                if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("E")) {
-                    GrammerSymbolIndexEquivalent = 0;
-                } else if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("T")) {
-                    GrammerSymbolIndexEquivalent = 1;
-                } else if (Grammer[Integer.parseInt(reduceState) - 1][0].equals("F")) {
-                    GrammerSymbolIndexEquivalent = 2;
-                } else {
-                    GrammerSymbolIndexEquivalent = -1;
-                }
-                // System.out.println("SS: " + topOfStackIndexEquivalent);
-                // System.out.println("GS: " + GrammerSymbolIndexEquivalent);
-                // Error Here Need Correct Indexing here
-                // System.out.println("Pushing: " +
-                // GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
+                int GrammerSymbolIndexEquivalent = GrammerSymbolIndex(Grammer[Integer.parseInt(reduceState) - 1][0]);
+                // Pushing The GOTO Table value into the stack
                 CurrentStack.push(GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
-                // System.out.println("After Goto: " + CurrentStack.toString());
                 System.out.println();
+                // Printing out the Production Rule
                 for (int z = 0; z < Grammer[Integer.parseInt(reduceState) - 1].length; z++) {
                     if (z == 0) {
                         System.out.print(
@@ -534,11 +568,15 @@ public class CompilerClass {
                     }
                 }
                 System.out.println();
-            } else if (ActionTable[s][BufferIndexEquivalent].equals("accept")) {
-                System.out.println("Compiled!");
+            }
+            // Condtion For Acceptance
+            else if (ActionTable[s][BufferIndexEquivalent].equals("accept")) {
+                System.out.println("\n Compiled Successfully!");
                 break;
-            } else {
-                System.out.println("Error");
+            }
+            // Error Routine
+            else {
+                System.out.println("Error At Line:1 Invalid Token: " + InputBuffer.get(InputBufferPointer));
                 break;
             }
         }
