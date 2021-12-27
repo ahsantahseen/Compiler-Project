@@ -16,7 +16,9 @@ JDK 11
 
 ## Instructions:
 
-Open terminal in the correct file directory 
+MAKE SURE TO HAVE JDK-11 Installed
+
+Open terminal in the correct file directory
 
 Use following commands
 
