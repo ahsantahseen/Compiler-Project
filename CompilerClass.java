@@ -343,6 +343,24 @@ public class CompilerClass {
                 // Clearing the lexeme once it's returned
                 lexeme = "";
 
+            } else if (line.charAt(i) == '\\') {
+                // Storing into lexeme
+                lexeme += line.charAt(i++);
+                // Looping through the line
+                while (i < line.length()) {
+                    // Concatinating lexeme
+                    lexeme += line.charAt(i);
+                    // Increment the pointer
+                    i++;
+                    // Regex for matching
+                    if (lexeme.matches("\\\n") || lexeme.matches("\\\t")) {
+                        // Returning the op
+                        break;
+                    }
+                }
+                // Clearing the lexeme once it's returned
+                lexeme = "";
+
             } else if (line.charAt(i) == '=') {
                 lexeme += line.charAt(i++);
                 // Taking the pointer to one step back
@@ -404,6 +422,7 @@ public class CompilerClass {
                 lexeme = "";
             }
         }
+
     }
 
     // ======= EOUM =======//
@@ -579,7 +598,7 @@ public class CompilerClass {
             }
             // Error Routine
             else {
-                System.out.println("Error At Line:1 Invalid Token: " + InputBuffer.get(InputBufferPointer));
+                System.out.println("Error At Line:1 Unrecognized Lexeme: " + InputBuffer.get(InputBufferPointer));
                 break;
             }
         }
