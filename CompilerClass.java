@@ -329,7 +329,9 @@ public class CompilerClass {
                     // Increment the pointer
                     i++;
                     // Regex for matching
-                    if (lexeme.matches("/ ")) {
+                    if (lexeme.matches("/[a-z]")||lexeme.matches("/ ")) {
+                        lexeme=lexeme.replaceAll(".$", "");
+                        i-=2;
                         // Returning the op
                         break;
                     }
