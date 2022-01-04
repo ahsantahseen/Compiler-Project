@@ -43,6 +43,8 @@ class Token {
 
 public class CompilerClass {
 
+    //Nesscarry Data Structures for Our Lexical Analyzer and Syntax Analysis
+    
     static ArrayList<Token> SymbolTable = new ArrayList<Token>();
     static String ActionTable[][] = {
             { "s5", "error", "error", "s4", "error", "error" },
@@ -228,7 +230,7 @@ public class CompilerClass {
                 attributeValue++;
                 System.out.println("Number : " + lexeme);
                 // Clearing the lexeme once it's returned
-                InputBuffer.add("in");
+                InputBuffer.add(lexeme);
                 lexeme = "";
             }
             // Condition to check for Strings
@@ -547,6 +549,10 @@ public class CompilerClass {
              */
             int s = IndexStackPeek(topOfStack);
             int BufferIndexEquivalent = IndexBufferInput(input);
+            /**
+            If the current input in unrecognizable it means we are directly
+            skipping and going to our error routine
+             */
             if(s!=-1&&BufferIndexEquivalent!=-1){
             // This is the condition for shift move
             if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
