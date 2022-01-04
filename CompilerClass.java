@@ -606,12 +606,14 @@ public class CompilerClass {
                 break;
             }
             else{
+                System.out.println("\n Compiling Failed!");
                 System.out.println("Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
                 break;
             }
             }
             // Error Routine
             else {
+                System.out.println("\n Compiling Failed!");
                 System.out.println("Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
                 break;
             }
