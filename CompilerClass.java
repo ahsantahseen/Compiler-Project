@@ -197,6 +197,7 @@ public class CompilerClass {
                     System.out.println("Keyword: " + lexeme);
                     // addToken(attributeValue, lexeme, "-", "-");
                     // attributeValue++;
+                    InputBuffer.add(lexeme);
                 }
                 // Otherwise we are returning it as a identifier
                 else {
@@ -227,6 +228,7 @@ public class CompilerClass {
                 attributeValue++;
                 System.out.println("Number : " + lexeme);
                 // Clearing the lexeme once it's returned
+                InputBuffer.add("in");
                 lexeme = "";
             }
             // Condition to check for Strings
@@ -255,6 +257,7 @@ public class CompilerClass {
                 addToken(attributeValue, "sl", "-", lexeme);
                 attributeValue++;
                 // Clearing the lexeme once it's returned
+                InputBuffer.add(lexeme);
                 lexeme = "";
             } else if (Character.isWhitespace(line.charAt(i))) {
                 // Do nothing
@@ -262,8 +265,20 @@ public class CompilerClass {
                 lexeme += line.charAt(i++);
                 while (i < line.length()) {
                     lexeme += line.charAt(i++);
-                    if (lexeme.matches("<>") || lexeme.matches("<=") || lexeme.matches("<.*")) {
+                    if (lexeme.matches("<>") ) {
+                        InputBuffer.add("<>");
                         break;
+                    }
+                    else if(lexeme.matches("<=") ){
+                     InputBuffer.add("<=");
+                     break;   
+                    }
+                    else if(lexeme.matches("<.*")){
+                     InputBuffer.add("<");
+                     break;
+                    }
+                    else{
+
                     }
 
                 }
@@ -288,6 +303,7 @@ public class CompilerClass {
                 System.out.println("ro : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add(">");
             } else if (line.charAt(i) == '+') {
                 lexeme += line.charAt(i++);
                 // Taking the pointer to one step back
@@ -306,6 +322,7 @@ public class CompilerClass {
                 System.out.println("ao : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("-");
 
             } else if (line.charAt(i) == '*') {
                 lexeme += line.charAt(i++);
@@ -329,7 +346,7 @@ public class CompilerClass {
                     // Increment the pointer
                     i++;
                     // Regex for matching
-                    if (lexeme.matches("/[a-z]")||lexeme.matches("/ ")) {
+                    if (lexeme.matches("/[a-z]|[A-Z]|[0-9]")||lexeme.matches("/ ")) {
                         lexeme=lexeme.replaceAll(".$", "");
                         i-=2;
                         // Returning the op
@@ -343,24 +360,7 @@ public class CompilerClass {
                     System.out.println("divide: " + lexeme);
                 }
                 // Clearing the lexeme once it's returned
-                lexeme = "";
-
-            } else if (line.charAt(i) == '\\') {
-                // Storing into lexeme
-                lexeme += line.charAt(i++);
-                // Looping through the line
-                while (i < line.length()) {
-                    // Concatinating lexeme
-                    lexeme += line.charAt(i);
-                    // Increment the pointer
-                    i++;
-                    // Regex for matching
-                    if (lexeme.matches("\\\n") || lexeme.matches("\\\t")) {
-                        // Returning the op
-                        break;
-                    }
-                }
-                // Clearing the lexeme once it's returned
+                InputBuffer.add(lexeme);
                 lexeme = "";
 
             } else if (line.charAt(i) == '=') {
@@ -400,6 +400,7 @@ public class CompilerClass {
                 System.out.println("oo : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("{");
             } else if (line.charAt(i) == '}') {
                 lexeme += line.charAt(i++);
                 // Taking the pointer to one step back
@@ -408,6 +409,7 @@ public class CompilerClass {
                 System.out.println("oo : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add("}");
             } else if (line.charAt(i) == ';') {
                 lexeme += line.charAt(i++);
                 // Taking the pointer to one step back
@@ -416,11 +418,12 @@ public class CompilerClass {
                 System.out.println("oo : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
+                InputBuffer.add(";");
             } else {
                 // Error Handling for unrecognized lexemes
                 lexeme += line.charAt(i);
-                System.out.println("Error: Unrecognized Lexeme: " + lexeme);
-                System.out.println("Line: " + (lineNumber - 1));
+                System.out.println("Lexical Error: Unrecognized Lexeme: " + lexeme+" At Line: " + (lineNumber - 1));
+                InputBuffer.add(lexeme);
                 lexeme = "";
             }
         }
@@ -529,8 +532,10 @@ public class CompilerClass {
             input = InputBuffer.get(InputBufferPointer);
             // Getting Top of the stack
             String topOfStack = CurrentStack.peek();
+            // Printing The Current Input
+            System.out.println("Current Input: "+input);
             // Printing The Current Stack
-            System.out.println(CurrentStack.toString());
+            System.out.println("Current Stack: "+CurrentStack.toString());
             /**
              * Here I am using various Index calculator functions that i made because
              * of my data structure to access 2D arrays i need index values rather than
@@ -542,11 +547,12 @@ public class CompilerClass {
              */
             int s = IndexStackPeek(topOfStack);
             int BufferIndexEquivalent = IndexBufferInput(input);
-
+            if(s!=-1&&BufferIndexEquivalent!=-1){
             // This is the condition for shift move
             if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
                 // Retriveing Which State to shift
                 String ShiftState = ActionTable[s][BufferIndexEquivalent].substring(1);
+                System.out.println("\nShift s"+ShiftState);
                 // Pushing Input Value of Buffer and the shift state
                 CurrentStack.push(input);
                 CurrentStack.push(ShiftState);
@@ -558,6 +564,7 @@ public class CompilerClass {
                 // Retriveing Which State to reduce
                 String reduceState = ActionTable[s][BufferIndexEquivalent].substring(1);
                 // Calculating the Pop length
+                System.out.println("\nReduce  r"+reduceState);
                 int popLen = Grammer[Integer.parseInt(reduceState) - 1].length;
                 // Popping from stack according the length
                 for (int j = 1; j < 2 * popLen - 1; j++) {
@@ -598,9 +605,14 @@ public class CompilerClass {
                 System.out.println("\n Compiled Successfully!");
                 break;
             }
+            else{
+                System.out.println("Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
+                break;
+            }
+            }
             // Error Routine
             else {
-                System.out.println("Error At Line:1 Unrecognized Lexeme: " + InputBuffer.get(InputBufferPointer));
+                System.out.println("Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
                 break;
             }
         }
