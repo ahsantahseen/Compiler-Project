@@ -9,6 +9,19 @@ Development Resources Used: Microsoft Visual Studio Code with Redhat Java Extens
 
 */
 
+/*
+    ======USEFUL CODE INDEX:=========== 
+
+    Token Class: Line 27
+    Main Class: Line 51
+    Program Related DataStructures: Line 54
+    Utility Methods: Line 98
+    Tokenizer : Line 100
+    Lexical Analysis: Line 447
+    Syntax Analysis: Line 532
+    Main Runner Method : Line 652
+*/
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,8 +56,8 @@ class Token {
 
 public class CompilerClass {
 
-    //Nesscarry Data Structures for Our Lexical Analyzer and Syntax Analysis
-    
+    // Nesscarry Data Structures for Our Lexical Analyzer and Syntax Analysis
+
     static ArrayList<Token> SymbolTable = new ArrayList<Token>();
     static String ActionTable[][] = {
             { "s5", "error", "error", "s4", "error", "error" },
@@ -85,7 +98,7 @@ public class CompilerClass {
     static ArrayList<String> InputBuffer = new ArrayList<String>();
     static Stack<String> CurrentStack = new Stack<String>();
     static int InputBufferPointer = 0;
-
+    static int keywordAttributeValue = -1;
     // ===== Utility Methods=======//
 
     /*
@@ -99,6 +112,7 @@ public class CompilerClass {
         for (int i = 0; i < keywords.length; i++) {
             // if our lexeme matches the keywords then return true
             if (lexeme.matches(keywords[i])) {
+                keywordAttributeValue = i;
                 return true;
             }
         }
@@ -196,9 +210,7 @@ public class CompilerClass {
                 i--;
                 // If our lexeme is a keyword we are returning it as a keyword
                 if (iskeyword(lexeme)) {
-                    System.out.println("Keyword: " + lexeme);
-                    // addToken(attributeValue, lexeme, "-", "-");
-                    // attributeValue++;
+                    System.out.println("Keyword: " + lexeme + " : " + keywordAttributeValue);
                     InputBuffer.add(lexeme);
                 }
                 // Otherwise we are returning it as a identifier
@@ -267,34 +279,36 @@ public class CompilerClass {
                 lexeme += line.charAt(i++);
                 while (i < line.length()) {
                     lexeme += line.charAt(i++);
-                    if (lexeme.matches("<>") ) {
+                    if (lexeme.matches("<>")) {
                         InputBuffer.add("<>");
+                        System.out.println("ro : " + lexeme + " :ne");
                         break;
-                    }
-                    else if(lexeme.matches("<=") ){
-                     InputBuffer.add("<=");
-                     break;   
-                    }
-                    else if(lexeme.matches("<.*")){
-                     InputBuffer.add("<");
-                     break;
-                    }
-                    else{
+                    } else if (lexeme.matches("<=")) {
+                        InputBuffer.add("<=");
+                        System.out.println("ro : " + lexeme + " :le");
+                        break;
+                    } else if (lexeme.matches("<.*")) {
+                        InputBuffer.add("<");
+                        System.out.println("ro : " + lexeme + " :lt");
+                        break;
+                    } else {
 
                     }
 
                 }
                 // Taking the pointer to one step back
                 i--;
-                // Returning the op
-                System.out.println("ro : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
             } else if (line.charAt(i) == '>') {
                 lexeme += line.charAt(i++);
                 while (i < line.length()) {
                     lexeme += line.charAt(i++);
-                    if (lexeme.matches(">=") || lexeme.matches(">.*")) {
+                    if (lexeme.matches(">=")) {
+                        System.out.println("ro : " + lexeme + " :ge");
+                        break;
+                    } else if (lexeme.matches(">.*")) {
+                        System.out.println("ro : " + lexeme + " :gt");
                         break;
                     }
 
@@ -302,7 +316,6 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("ro : " + lexeme);
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add(">");
@@ -311,7 +324,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("ao : " + lexeme);
+                System.out.println("ao : " + lexeme + " :ad");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("+");
@@ -321,7 +334,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("ao : " + lexeme);
+                System.out.println("ao : " + lexeme + " :sb");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("-");
@@ -331,7 +344,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("ao : " + lexeme);
+                System.out.println("ao : " + lexeme + " :ml");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("*");
@@ -348,9 +361,9 @@ public class CompilerClass {
                     // Increment the pointer
                     i++;
                     // Regex for matching
-                    if (lexeme.matches("/[a-z]|[A-Z]|[0-9]")||lexeme.matches("/ ")) {
-                        lexeme=lexeme.replaceAll(".$", "");
-                        i-=2;
+                    if (lexeme.matches("/[a-z]|[A-Z]|[0-9]") || lexeme.matches("/ ")) {
+                        lexeme = lexeme.replaceAll(".$", "");
+                        i -= 2;
                         // Returning the op
                         break;
                     }
@@ -359,7 +372,7 @@ public class CompilerClass {
                 if (lexeme.startsWith("//") || lexeme.startsWith("/*")) {
                     System.out.println("comment: " + lexeme);
                 } else {
-                    System.out.println("divide: " + lexeme);
+                    System.out.println("divide: " + lexeme + " :dv");
                 }
                 // Clearing the lexeme once it's returned
                 InputBuffer.add(lexeme);
@@ -370,7 +383,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :eq");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
 
@@ -379,7 +392,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :op");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("(");
@@ -389,7 +402,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :cp");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add(")");
@@ -399,7 +412,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :ob");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("{");
@@ -408,7 +421,7 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :cb");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add("}");
@@ -417,14 +430,14 @@ public class CompilerClass {
                 // Taking the pointer to one step back
                 i--;
                 // Returning the op
-                System.out.println("oo : " + lexeme);
+                System.out.println("oo : " + lexeme + " :tr");
                 // Clearing the lexeme once it's returned
                 lexeme = "";
                 InputBuffer.add(";");
             } else {
                 // Error Handling for unrecognized lexemes
                 lexeme += line.charAt(i);
-                System.out.println("Lexical Error: Unrecognized Lexeme: " + lexeme+" At Line: " + (lineNumber - 1));
+                System.out.println("Lexical Error: Unrecognized Lexeme: " + lexeme + " At Line: " + (lineNumber - 1));
                 InputBuffer.add(lexeme);
                 lexeme = "";
             }
@@ -535,9 +548,9 @@ public class CompilerClass {
             // Getting Top of the stack
             String topOfStack = CurrentStack.peek();
             // Printing The Current Input
-            System.out.println("Current Input: "+input);
+            System.out.println("Current Input: " + input);
             // Printing The Current Stack
-            System.out.println("Current Stack: "+CurrentStack.toString());
+            System.out.println("Current Stack: " + CurrentStack.toString());
             /**
              * Here I am using various Index calculator functions that i made because
              * of my data structure to access 2D arrays i need index values rather than
@@ -550,72 +563,73 @@ public class CompilerClass {
             int s = IndexStackPeek(topOfStack);
             int BufferIndexEquivalent = IndexBufferInput(input);
             /**
-            If the current input in unrecognizable it means we are directly
-            skipping and going to our error routine
+             * If the current input in unrecognizable it means we are directly
+             * skipping and going to our error routine
              */
-            if(s!=-1&&BufferIndexEquivalent!=-1){
-            // This is the condition for shift move
-            if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
-                // Retriveing Which State to shift
-                String ShiftState = ActionTable[s][BufferIndexEquivalent].substring(1);
-                System.out.println("\nShift s"+ShiftState);
-                // Pushing Input Value of Buffer and the shift state
-                CurrentStack.push(input);
-                CurrentStack.push(ShiftState);
-                // Incrementing to the next input in the buffer using this pointer variable
-                InputBufferPointer++;
-            }
-            // This is the condition for reduce state
-            else if (ActionTable[s][BufferIndexEquivalent].startsWith("r")) {
-                // Retriveing Which State to reduce
-                String reduceState = ActionTable[s][BufferIndexEquivalent].substring(1);
-                // Calculating the Pop length
-                System.out.println("\nReduce  r"+reduceState);
-                int popLen = Grammer[Integer.parseInt(reduceState) - 1].length;
-                // Popping from stack according the length
-                for (int j = 1; j < 2 * popLen - 1; j++) {
-                    CurrentStack.pop();
+            if (s != -1 && BufferIndexEquivalent != -1) {
+                // This is the condition for shift move
+                if (ActionTable[s][BufferIndexEquivalent].startsWith("s")) {
+                    // Retriveing Which State to shift
+                    String ShiftState = ActionTable[s][BufferIndexEquivalent].substring(1);
+                    System.out.println("\nShift s" + ShiftState);
+                    // Pushing Input Value of Buffer and the shift state
+                    CurrentStack.push(input);
+                    CurrentStack.push(ShiftState);
+                    // Incrementing to the next input in the buffer using this pointer variable
+                    InputBufferPointer++;
                 }
-                // Updating the top of the stack value
-                topOfStack = CurrentStack.peek();
-                /**
-                 * Here I am using various Index calculator functions that i made because
-                 * of my data structure to access 2D arrays i need index values rather than
-                 * the value itself so i am using functions that i made that calculates the
-                 * index
-                 * according the given input (Utility Functions are defined Above in the class
-                 * as static functions)
-                 * 
-                 */
-                int topOfStackIndexEquivalent = IndexStackPeek(topOfStack);
-                // Pushing The Symbol in the Stack
-                CurrentStack.push(Grammer[Integer.parseInt(reduceState) - 1][0]);
-                int GrammerSymbolIndexEquivalent = GrammerSymbolIndex(Grammer[Integer.parseInt(reduceState) - 1][0]);
-                // Pushing The GOTO Table value into the stack
-                CurrentStack.push(GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
-                System.out.println();
-                // Printing out the Production Rule
-                for (int z = 0; z < Grammer[Integer.parseInt(reduceState) - 1].length; z++) {
-                    if (z == 0) {
-                        System.out.print(
-                                Grammer[Integer.parseInt(reduceState) - 1][z] + "-->");
-                    } else {
-                        System.out.print(
-                                Grammer[Integer.parseInt(reduceState) - 1][z]);
+                // This is the condition for reduce state
+                else if (ActionTable[s][BufferIndexEquivalent].startsWith("r")) {
+                    // Retriveing Which State to reduce
+                    String reduceState = ActionTable[s][BufferIndexEquivalent].substring(1);
+                    // Calculating the Pop length
+                    System.out.println("\nReduce  r" + reduceState);
+                    int popLen = Grammer[Integer.parseInt(reduceState) - 1].length;
+                    // Popping from stack according the length
+                    for (int j = 1; j < 2 * popLen - 1; j++) {
+                        CurrentStack.pop();
                     }
+                    // Updating the top of the stack value
+                    topOfStack = CurrentStack.peek();
+                    /**
+                     * Here I am using various Index calculator functions that i made because
+                     * of my data structure to access 2D arrays i need index values rather than
+                     * the value itself so i am using functions that i made that calculates the
+                     * index
+                     * according the given input (Utility Functions are defined Above in the class
+                     * as static functions)
+                     * 
+                     */
+                    int topOfStackIndexEquivalent = IndexStackPeek(topOfStack);
+                    // Pushing The Symbol in the Stack
+                    CurrentStack.push(Grammer[Integer.parseInt(reduceState) - 1][0]);
+                    int GrammerSymbolIndexEquivalent = GrammerSymbolIndex(
+                            Grammer[Integer.parseInt(reduceState) - 1][0]);
+                    // Pushing The GOTO Table value into the stack
+                    CurrentStack.push(GotoTable[topOfStackIndexEquivalent][GrammerSymbolIndexEquivalent]);
+                    System.out.println();
+                    // Printing out the Production Rule
+                    for (int z = 0; z < Grammer[Integer.parseInt(reduceState) - 1].length; z++) {
+                        if (z == 0) {
+                            System.out.print(
+                                    Grammer[Integer.parseInt(reduceState) - 1][z] + "-->");
+                        } else {
+                            System.out.print(
+                                    Grammer[Integer.parseInt(reduceState) - 1][z]);
+                        }
+                    }
+                    System.out.println();
                 }
-                System.out.println();
-            }
-            // Condtion For Acceptance
-            else if (ActionTable[s][BufferIndexEquivalent].equals("accept")) {
-                System.out.println("\n Compiled Successfully!");
-                break;
-            }
-            else{
-                System.out.println("\n Compiling Failed!");
-                System.out.println("Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
-                break;
-            }
+                // Condtion For Acceptance
+                else if (ActionTable[s][BufferIndexEquivalent].equals("accept")) {
+                    System.out.println("\n Compiled Successfully!");
+                    break;
+                } else {
+                    System.out.println("\n Compiling Failed!");
+                    System.out.println(
+                            "Syntax Error At Line:1 Unexpected Symbol: " + InputBuffer.get(InputBufferPointer));
+                    break;
+                }
             }
             // Error Routine
             else {
