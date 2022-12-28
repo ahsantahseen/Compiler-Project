@@ -1,6 +1,5 @@
 # Compiler-Project
 
-## Author: Muhammad Ahsan 1912310 Section 5F BSCS
 
 ## Language: Java
 
